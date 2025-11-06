@@ -8,7 +8,9 @@ async def _existing_profiles(db) -> Dict[str, Tuple[int, str]]:
     Ritorna mappa ha_user_id -> (profile_id, display_name) per i profili già presenti.
     """
     out: Dict[str, Tuple[int, str]] = {}
-    async with db.conn.execute("SELECT id, ha_user_id, display_name FROM diet_profiles") as c:
+    async with db.conn.execute(
+        "SELECT id, ha_user_id, display_name FROM diet_profiles"
+    ) as c:
         async for row in c:
             out[row[1]] = (row[0], row[2])
     return out
@@ -99,7 +101,8 @@ async def sync_profiles_from_ha(
     # Nota: .async_get_users() ritorna User objects con .id, .name, .is_active, .system_generated
     ha_users = await hass.auth.async_get_users()
     selected = [
-        u for u in ha_users
+        u
+        for u in ha_users
         if u.is_active and (include_system or not u.system_generated)
     ]
 

@@ -2,7 +2,9 @@ from __future__ import annotations
 from homeassistant.core import HomeAssistant
 
 
-async def get_profile_id_by_ha_user(hass: HomeAssistant, db, ha_user_id: str) -> int | None:
+async def get_profile_id_by_ha_user(
+    hass: HomeAssistant, db, ha_user_id: str
+) -> int | None:
     """Ritorna il profile_id associato all'utente HA, se presente."""
     async with db.conn.execute(
         "SELECT id FROM diet_profiles WHERE ha_user_id=?",
@@ -12,7 +14,9 @@ async def get_profile_id_by_ha_user(hass: HomeAssistant, db, ha_user_id: str) ->
     return row[0] if row else None
 
 
-async def ensure_profile(hass: HomeAssistant, db, ha_user_id: str, display_name: str | None = None) -> int:
+async def ensure_profile(
+    hass: HomeAssistant, db, ha_user_id: str, display_name: str | None = None
+) -> int:
     """Crea (se mancante) e ritorna il profile_id per l'utente HA."""
     pid = await get_profile_id_by_ha_user(hass, db, ha_user_id)
     if pid is not None:

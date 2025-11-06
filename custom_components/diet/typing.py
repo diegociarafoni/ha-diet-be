@@ -21,7 +21,7 @@ class TemplateMealAlt(TypedDict):
 
 class TemplateMeal(TypedDict):
     id: int
-    dow: int                        # 0=Mon ... 6=Sun
+    dow: int  # 0=Mon ... 6=Sun
     meal_type: MealType
     title: NotRequired[str]
     proposed_label: NotRequired[str]
@@ -60,15 +60,15 @@ class SnacksState(TypedDict, total=False):
 
 
 class DayData(TypedDict, total=False):
-    date: str                  # ISO YYYY-MM-DD
-    hunger: NotRequired[int]   # 1..5
+    date: str  # ISO YYYY-MM-DD
+    hunger: NotRequired[int]  # 1..5
     notes: NotRequired[str]
     snacks: SnacksState
     meals: List[DayMeal]
 
 
 class WeekResponse(TypedDict):
-    start: str                 # Monday ISO date
+    start: str  # Monday ISO date
     days: List[DayData]
 
 
