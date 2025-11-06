@@ -17,7 +17,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await db.async_open()
     coord = DietCoordinator(hass, db)
     await coord.async_initialize()
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {"db": db, "coordinator": coord}
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
+        "db": db, "coordinator": coord}
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     async_register_services(hass, db, coord)
     async_register_ws(hass, db, coord)

@@ -12,7 +12,8 @@ class DietConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
         # Consente una sola configurazione
-        existing = any(e.domain == DOMAIN for e in self._async_current_entries())
+        existing = any(
+            e.domain == DOMAIN for e in self._async_current_entries())
         if existing:
             return self.async_abort(reason="single_instance_allowed")
 
