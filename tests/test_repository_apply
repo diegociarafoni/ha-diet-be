@@ -1,0 +1,64 @@
+import pytest
+from datetime import date, timedelta
+from custom_components.diet.repository import DietRepo
+
+
+def _monday(d: date) -> date:
+    return d - timedelta(days=d.weekday())
+
+
+@pytest.mark.asyncio
+async def test_apply_week_template_inserts_free_dinners(diet_db):
+    db, _ = diet_db
+    repo = DietRepo(db)
+
+    # Crea un template condiviso attivo
+    await db.conn.execute(
+        "INSERT INTO week_templates(profile_id,name,description,is_active,created_at,updated_at) "
+        "VALUES (NULL,'Condiviso','Base',1,datetime('now'),datetime('now'))"
+    )
+    async with db.conn.execute("SELECT id FROM week_templates WHERE is_active=1") as c:
+        tpl_id = (await c.fetchone())[0]
+
+    # Inserisci pasti nel template: per semplicità mettiamo solo dinner con default_source='free' due volte
+    # Lunedì dinner FREE, Mercoledì dinner FREE
+    for dow in (0, 2):
+        await db.conn.execute(
+            "INSERT INTO template_meals(template_id,dow,meal_type,title,required,default_source) "
+            "VALUES (?,?,?,?,?,?)",
+            (tpl_id, dow, "dinner", None, 1, "free"),
+        )
+
+    # Un esempio di pranzo proposto martedì
+    await db.conn.execute(
+        "INSERT INTO template_meals(template_id,dow,meal_type,title,required,default_source) "
+        "VALUES (?,?,?,?,?,?)",
+        (tpl_id, 1, "lunch", "Pollo e riso", 1, "proposed"),
+    )
+    await db.conn.commit()
+
+    # Crea un profilo fittizio
+    await db.conn.execute(
+        "INSERT INTO diet_profiles(ha_user_id,display_name,created_at) VALUES(?,?,datetime('now'))",
+        ("user-1", "Diego"),
+    )
+    async with db.conn.execute("SELECT id FROM diet_profiles WHERE ha_user_id=?", ("user-1",)) as c:
+        profile_id = (await c.fetchone())[0]
+
+    start = _monday(date.today()).isoformat()
+    await repo.apply_week_template(profile_id, start, tpl_id)
+
+    # Verifica che day_meals abbia 2 righe free dinner e free_meals due righe
+    async with db.conn.execute(
+        "SELECT COUNT(*) FROM day_meals WHERE profile_id=? AND meal_type='dinner' AND chosen_source='free'",
+        (profile_id,),
+    ) as c:
+        free_dinners = (await c.fetchone())[0]
+    assert free_dinners == 2
+
+    async with db.conn.execute(
+        "SELECT COUNT(*) FROM free_meals WHERE profile_id=? AND meal_type='dinner'",
+        (profile_id,),
+    ) as c:
+        free_meals = (await c.fetchone())[0]
+    assert free_meals == 2
