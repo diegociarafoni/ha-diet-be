@@ -29,7 +29,9 @@ class DietRepo:
             r = await c.fetchone()
         return r[0] if r else None
 
-    async def apply_week_template(self, profile_id: int, start_monday: str, template_id: int):
+    async def apply_week_template(
+        self, profile_id: int, start_monday: str, template_id: int
+    ):
         """Crea plan_days e pre-popola FREE/SKIP da default_source."""
         start = datetime.fromisoformat(start_monday)
 
@@ -247,18 +249,26 @@ class DietRepo:
                     "meal_type": mt,
                     "proposed": {"title": tm[1], "items": tm[2]} if tm else None,
                     "alternatives": alts,
-                    "chosen": {
-                        "source": chosen[0],
-                        "title": chosen[1],
-                        "notes": chosen[2],
-                        "ts": chosen[3],
-                    }
-                    if chosen
-                    else None,
+                    "chosen": (
+                        {
+                            "source": chosen[0],
+                            "title": chosen[1],
+                            "notes": chosen[2],
+                            "ts": chosen[3],
+                        }
+                        if chosen
+                        else None
+                    ),
                 }
             )
 
-        return {"date": iso_date, "hunger": hunger, "notes": notes, "snacks": snacks, "meals": meals}
+        return {
+            "date": iso_date,
+            "hunger": hunger,
+            "notes": notes,
+            "snacks": snacks,
+            "meals": meals,
+        }
 
     async def get_week(self, profile_id: int, start_monday: str) -> list[dict]:
         """Ritorna i dati dei 7 giorni della settimana."""
@@ -272,7 +282,9 @@ class DietRepo:
     # -------------------------------
     # SWAP
     # -------------------------------
-    async def swap_meal(self, profile_id: int, date_from: str, date_to: str, meal_type: str) -> None:
+    async def swap_meal(
+        self, profile_id: int, date_from: str, date_to: str, meal_type: str
+    ) -> None:
         """Registra uno swap forward-only (audit)."""
         await self.db.conn.execute(
             """

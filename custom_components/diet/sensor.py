@@ -7,7 +7,9 @@ from homeassistant.helpers.entity import EntityCategory
 from .const import DOMAIN
 
 
-async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback):
+async def async_setup_entry(
+    hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback
+):
     """Crea i sensori per ciascun profilo presente nel DB."""
     db = hass.data[DOMAIN][entry.entry_id]["db"]
 
@@ -18,12 +20,13 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities: AddE
 
     entities: list[SensorEntity] = []
     for profile_id, display_name in profiles:
-        entities.append(HungerAvgSensor(
-            hass, entry.entry_id, profile_id, display_name))
-        entities.append(SnacksCompletedTodaySensor(
-            hass, entry.entry_id, profile_id, display_name))
-        entities.append(FreeMealsUsedWeekSensor(
-            hass, entry.entry_id, profile_id, display_name))
+        entities.append(HungerAvgSensor(hass, entry.entry_id, profile_id, display_name))
+        entities.append(
+            SnacksCompletedTodaySensor(hass, entry.entry_id, profile_id, display_name)
+        )
+        entities.append(
+            FreeMealsUsedWeekSensor(hass, entry.entry_id, profile_id, display_name)
+        )
 
     async_add_entities(entities)
 
@@ -34,7 +37,9 @@ class BaseDietSensor(SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_has_entity_name = True
 
-    def __init__(self, hass: HomeAssistant, entry_id: str, profile_id: int, display_name: str):
+    def __init__(
+        self, hass: HomeAssistant, entry_id: str, profile_id: int, display_name: str
+    ):
         self.hass = hass
         self._entry_id = entry_id
         self.profile_id = profile_id
@@ -66,8 +71,7 @@ class HungerAvgSensor(BaseDietSensor):
         """
         async with self._db.conn.execute(q, (self.profile_id,)) as c:
             r = await c.fetchone()
-        self._attr_native_value = round(
-            r[0], 1) if r and r[0] is not None else None
+        self._attr_native_value = round(r[0], 1) if r and r[0] is not None else None
 
 
 class SnacksCompletedTodaySensor(BaseDietSensor):

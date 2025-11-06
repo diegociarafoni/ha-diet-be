@@ -16,7 +16,6 @@ CREATE_BASE = [
         value TEXT
     );
     """,
-
     # Profili utenti HA
     """
     CREATE TABLE IF NOT EXISTS diet_profiles (
@@ -28,7 +27,6 @@ CREATE_BASE = [
         UNIQUE(ha_user_id)
     );
     """,
-
     # ACL di lettura/scrittura tra profili
     """
     CREATE TABLE IF NOT EXISTS profile_acl (
@@ -40,7 +38,6 @@ CREATE_BASE = [
         UNIQUE(owner_profile_id, subject_profile_id)
     );
     """,
-
     # Template settimanali
     """
     CREATE TABLE IF NOT EXISTS week_templates (
@@ -53,7 +50,6 @@ CREATE_BASE = [
         updated_at TEXT NOT NULL
     );
     """,
-
     # Pasti nei template
     """
     CREATE TABLE IF NOT EXISTS template_meals (
@@ -70,7 +66,6 @@ CREATE_BASE = [
         FOREIGN KEY(template_id) REFERENCES week_templates(id)
     );
     """,
-
     # Alternative per i pasti
     """
     CREATE TABLE IF NOT EXISTS template_meal_alternatives (
@@ -83,7 +78,6 @@ CREATE_BASE = [
         FOREIGN KEY(template_meal_id) REFERENCES template_meals(id)
     );
     """,
-
     # Giorni pianificati
     """
     CREATE TABLE IF NOT EXISTS plan_days (
@@ -96,7 +90,6 @@ CREATE_BASE = [
         updated_at TEXT NOT NULL
     );
     """,
-
     # Pasti scelti o completati
     """
     CREATE TABLE IF NOT EXISTS day_meals (
@@ -112,7 +105,6 @@ CREATE_BASE = [
         ts TEXT
     );
     """,
-
     # Storico swap
     """
     CREATE TABLE IF NOT EXISTS swaps (
@@ -124,7 +116,6 @@ CREATE_BASE = [
         ts TEXT NOT NULL
     );
     """,
-
     # Spuntini
     """
     CREATE TABLE IF NOT EXISTS snacks (
@@ -137,7 +128,6 @@ CREATE_BASE = [
         UNIQUE(profile_id, date, period)
     );
     """,
-
     # Pasti free
     """
     CREATE TABLE IF NOT EXISTS free_meals (
@@ -149,7 +139,6 @@ CREATE_BASE = [
         ts TEXT NOT NULL
     );
     """,
-
     # Indici
     """
     CREATE INDEX IF NOT EXISTS idx_plan_days_p ON plan_days(profile_id, date);
@@ -186,7 +175,9 @@ class DietDb:
     async def _migrate(self):
         """Esegue la creazione o aggiornamento schema."""
         try:
-            async with self._conn.execute("SELECT value FROM meta WHERE key='schema_version'") as c:
+            async with self._conn.execute(
+                "SELECT value FROM meta WHERE key='schema_version'"
+            ) as c:
                 row = await c.fetchone()
             current = int(row[0]) if row else 0
         except Exception:

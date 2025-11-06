@@ -55,7 +55,7 @@ SCHEMA_CHOICE = SCHEMA_OWNER.extend(
         vol.Required("date"): cv.date,
         vol.Required("meal_type"): vol.In(MEAL_TYPES),
         vol.Required("source"): vol.In(["proposed", "alternative", "free", "skipped"]),
-        vol.Optional("title"): str,          # consigliato: titolo breve
+        vol.Optional("title"): str,  # consigliato: titolo breve
         # futuro: validare appartenenza al template
         vol.Optional("alternative_id"): int,
         vol.Optional("notes"): str,
@@ -75,6 +75,7 @@ SCHEMA_SYNC_PROFILES = vol.Schema(
 
 # ---- Registrazione servizi ---------------------------------------------------
 
+
 async def async_register_services(hass: HomeAssistant, db, coord) -> None:
     repo = DietRepo(db)
 
@@ -84,7 +85,11 @@ async def async_register_services(hass: HomeAssistant, db, coord) -> None:
         subject_pid = await get_profile_id_by_ha_user(hass, db, subject_uid)
         if subject_pid is None:
             raise ValueError("Profilo non registrato per l'utente corrente")
-        allowed = await (check_acl_write(db, owner_pid, subject_pid) if write else check_acl_read(db, owner_pid, subject_pid))
+        allowed = await (
+            check_acl_write(db, owner_pid, subject_pid)
+            if write
+            else check_acl_read(db, owner_pid, subject_pid)
+        )
         if not allowed:
             raise ValueError("Permesso negato")
         return subject_pid
@@ -113,17 +118,22 @@ async def async_register_services(hass: HomeAssistant, db, coord) -> None:
         dfrom, dto = data["date_from"], data["date_to"]
         if dto <= dfrom:
             raise ValueError(
-                "Scambio consentito solo verso giorni successivi della stessa settimana")
+                "Scambio consentito solo verso giorni successivi della stessa settimana"
+            )
         if dfrom.isocalendar()[1] != dto.isocalendar()[1]:
             raise ValueError("Lo scambio deve rimanere nella stessa settimana")
 
-        await repo.swap_meal(owner_pid, dfrom.isoformat(), dto.isoformat(), data["meal_type"])
+        await repo.swap_meal(
+            owner_pid, dfrom.isoformat(), dto.isoformat(), data["meal_type"]
+        )
 
     async def _snack(call: ServiceCall) -> None:
         data = SCHEMA_SNACK(call.data)
         owner_pid = data["owner_profile_id"]
         await _authorize(call, owner_pid, write=True)
-        await repo.set_snack(owner_pid, data["date"].isoformat(), data["period"], data["done"])
+        await repo.set_snack(
+            owner_pid, data["date"].isoformat(), data["period"], data["done"]
+        )
 
     async def _hunger(call: ServiceCall) -> None:
         data = SCHEMA_HUNGER(call.data)
@@ -141,7 +151,9 @@ async def async_register_services(hass: HomeAssistant, db, coord) -> None:
 
         # Quota free: applica policy hard/soft
         if src == "free":
-            used = await repo.free_meals_used_in_week(owner_pid, data["date"].isoformat())
+            used = await repo.free_meals_used_in_week(
+                owner_pid, data["date"].isoformat()
+            )
             quota = DEFAULTS[CONF_FREE_MEALS_PER_WEEK]
             if used >= quota and DEFAULTS[CONF_FREE_LIMIT_MODE] == "hard":
                 raise ValueError("Quota pasti free settimanale superata")
@@ -176,4 +188,5 @@ async def async_register_services(hass: HomeAssistant, db, coord) -> None:
     hass.services.async_register(DOMAIN, "set_hunger", _hunger)
     hass.services.async_register(DOMAIN, "set_choice", _choice)
     hass.services.async_register(
-        DOMAIN, "sync_profiles_from_ha", _sync_profiles)  # <-- NUOVO
+        DOMAIN, "sync_profiles_from_ha", _sync_profiles
+    )  # <-- NUOVO

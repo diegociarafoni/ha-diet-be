@@ -27,7 +27,8 @@ async def async_register_ws(hass: HomeAssistant, db, coord) -> None:
         subject = await _subject_pid(connection)
         if subject is None:
             connection.send_result(
-                msg["id"], {"subject_profile_id": None, "profiles": []})
+                msg["id"], {"subject_profile_id": None, "profiles": []}
+            )
             return
 
         profiles = []
@@ -36,7 +37,7 @@ async def async_register_ws(hass: HomeAssistant, db, coord) -> None:
                 pid, name = r
                 can_read = await check_acl_read(db, pid, subject)
                 # policy: solo self in scrittura (di default)
-                can_write = (pid == subject)
+                can_write = pid == subject
                 profiles.append(
                     {
                         "profile_id": pid,
@@ -47,7 +48,8 @@ async def async_register_ws(hass: HomeAssistant, db, coord) -> None:
                 )
 
         connection.send_result(
-            msg["id"], {"subject_profile_id": subject, "profiles": profiles})
+            msg["id"], {"subject_profile_id": subject, "profiles": profiles}
+        )
 
     # ---------------------------------------------------------------------
     # GET DAY
@@ -101,7 +103,7 @@ async def async_register_ws(hass: HomeAssistant, db, coord) -> None:
         {
             "type": "diet/get_next_meals",
             "owner_profile_ids": list,  # [int, ...]
-            "horizon_hours": int,       # default 36
+            "horizon_hours": int,  # default 36
         }
     )
     @websocket_api.async_response
@@ -127,18 +129,17 @@ async def async_register_ws(hass: HomeAssistant, db, coord) -> None:
             day = await repo.get_day(pid, today)
 
             for mt in ("lunch", "dinner"):
-                m = next((x for x in day["meals"]
-                         if x["meal_type"] == mt), None)
+                m = next((x for x in day["meals"] if x["meal_type"] == mt), None)
                 if m:
-                    status = (m["chosen"]["source"] if m.get(
-                        "chosen") else "planned")
+                    status = m["chosen"]["source"] if m.get("chosen") else "planned"
                     title = (
                         m["chosen"]["title"]
                         if m.get("chosen")
                         else (m["proposed"]["title"] if m.get("proposed") else "")
                     )
-                    meals.append({"type": mt, "date": today,
-                                 "title": title, "status": status})
+                    meals.append(
+                        {"type": mt, "date": today, "title": title, "status": status}
+                    )
 
             payload["profiles"].append(
                 {
