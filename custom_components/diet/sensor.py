@@ -20,15 +20,12 @@ async def async_setup_entry(
 
     entities: list[SensorEntity] = []
     for profile_id, display_name in profiles:
-        entities.append(HungerAvgSensor(
-            hass, entry.entry_id, profile_id, display_name))
+        entities.append(HungerAvgSensor(hass, entry.entry_id, profile_id, display_name))
         entities.append(
-            SnacksCompletedTodaySensor(
-                hass, entry.entry_id, profile_id, display_name)
+            SnacksCompletedTodaySensor(hass, entry.entry_id, profile_id, display_name)
         )
         entities.append(
-            FreeMealsUsedWeekSensor(
-                hass, entry.entry_id, profile_id, display_name)
+            FreeMealsUsedWeekSensor(hass, entry.entry_id, profile_id, display_name)
         )
 
     async_add_entities(entities)
@@ -74,8 +71,7 @@ class HungerAvgSensor(BaseDietSensor):
         """
         async with self._db.conn.execute(q, (self.profile_id,)) as c:
             r = await c.fetchone()
-        self._attr_native_value = round(
-            r[0], 1) if r and r[0] is not None else None
+        self._attr_native_value = round(r[0], 1) if r and r[0] is not None else None
 
 
 class SnacksCompletedTodaySensor(BaseDietSensor):

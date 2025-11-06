@@ -129,11 +129,9 @@ async def async_register_ws(hass: HomeAssistant, db, coord) -> None:
             day = await repo.get_day(pid, today)
 
             for mt in ("lunch", "dinner"):
-                m = next((x for x in day["meals"]
-                         if x["meal_type"] == mt), None)
+                m = next((x for x in day["meals"] if x["meal_type"] == mt), None)
                 if m:
-                    status = m["chosen"]["source"] if m.get(
-                        "chosen") else "planned"
+                    status = m["chosen"]["source"] if m.get("chosen") else "planned"
                     title = (
                         m["chosen"]["title"]
                         if m.get("chosen")
