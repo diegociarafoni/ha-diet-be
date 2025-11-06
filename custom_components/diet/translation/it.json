@@ -1,0 +1,14 @@
+{
+  "title": "Diet Manager",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Diet Manager",
+        "description": "Crea la configurazione dell'integrazione Diet (una sola istanza)."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Diet Manager è già configurato."
+    }
+  }
+}

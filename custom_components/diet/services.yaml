@@ -1,0 +1,192 @@
+apply_week_template:
+  name: Applica template settimanale
+  description: Crea/aggiorna il piano della settimana a partire dal template attivo.
+  fields:
+    owner_profile_id:
+      name: Profilo (proprietario)
+      description: ID del profilo a cui applicare il template.
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          mode: box
+    start_date:
+      name: Data di inizio
+      description: Qualsiasi giorno della settimana; verrà normalizzato al lunedì.
+      required: true
+      example: "2025-11-03"
+      selector:
+        date:
+    template_id:
+      name: Template ID
+      description: Se omesso, usa il template attivo (personale > condiviso).
+      required: false
+      example: 3
+      selector:
+        number:
+          min: 1
+          mode: box
+
+swap_meal:
+  name: Scambia pasto (stessa settimana)
+  description: Scambia un pasto tra due giorni successivi all'interno della stessa settimana.
+  fields:
+    owner_profile_id:
+      name: Profilo (proprietario)
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    date_from:
+      name: Dal giorno
+      required: true
+      selector:
+        date:
+    date_to:
+      name: Al giorno
+      required: true
+      selector:
+        date:
+    meal_type:
+      name: Tipo pasto
+      required: true
+      selector:
+        select:
+          options:
+            - breakfast
+            - lunch
+            - dinner
+            - snack_am
+            - snack_pm
+
+set_snack:
+  name: Spuntino fatto/non fatto
+  description: Imposta lo stato dello spuntino AM/PM.
+  fields:
+    owner_profile_id:
+      name: Profilo (proprietario)
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    date:
+      name: Giorno
+      required: true
+      selector:
+        date:
+    period:
+      name: Periodo
+      required: true
+      selector:
+        select:
+          options:
+            - am
+            - pm
+    done:
+      name: Fatto
+      required: true
+      selector:
+        boolean:
+
+set_hunger:
+  name: Livello di fame (1–5)
+  description: Registra la fame percepita per il giorno.
+  fields:
+    owner_profile_id:
+      name: Profilo (proprietario)
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    date:
+      name: Giorno
+      required: true
+      selector:
+        date:
+    score:
+      name: Punteggio
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 5
+          step: 1
+          mode: slider
+
+set_choice:
+  name: Scelta pasto
+  description: Registra la scelta del pasto (proposed/alternative/free/skipped).
+  fields:
+    owner_profile_id:
+      name: Profilo (proprietario)
+      required: true
+      selector:
+        number:
+          min: 1
+          mode: box
+    date:
+      name: Giorno
+      required: true
+      selector:
+        date:
+    meal_type:
+      name: Tipo pasto
+      required: true
+      selector:
+        select:
+          options:
+            - breakfast
+            - lunch
+            - dinner
+            - snack_am
+            - snack_pm
+    source:
+      name: Sorgente scelta
+      required: true
+      selector:
+        select:
+          options:
+            - proposed
+            - alternative
+            - free
+            - skipped
+    title:
+      name: Titolo (opzionale)
+      required: false
+      selector:
+        text:
+    alternative_id:
+      name: ID alternativa (opzionale)
+      required: false
+      selector:
+        number:
+          min: 1
+          mode: box
+    notes:
+      name: Note
+      required: false
+      selector:
+        text:
+
+sync_profiles_from_ha:
+  name: Sincronizza profili da Home Assistant
+  description: Allinea diet_profiles con l'user registry di HA e ACL incrociate (read-only).
+  fields:
+    prune_missing:
+      name: Rimuovi profili orfani
+      description: Se true, elimina profili non più presenti in HA (⚠️ comporta perdita dati associati).
+      required: false
+      default: false
+      selector:
+        boolean:
+    include_system:
+      name: Includi utenti di sistema
+      description: Se true, sincronizza anche gli utenti generati dal sistema.
+      required: false
+      default: false
+      selector:
+        boolean:

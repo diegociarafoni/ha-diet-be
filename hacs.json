@@ -1,0 +1,13 @@
+{
+  "name": "Diet Manager",
+  "domain": "diet",
+  "homeassistant": "2024.6.0",
+  "render_readme": true,
+  "country": "IT",
+  "zip_release": false,
+  "filename": "diet.zip",
+  "content_in_root": false,
+  "persistent_directory": "custom_components/diet",
+  "iot_class": "local_push",
+  "hide_default_branch": false
+}

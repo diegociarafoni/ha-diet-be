@@ -1,0 +1,14 @@
+{
+  "title": "Diet Manager",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Diet Manager",
+        "description": "Create the Diet integration entry (single instance)."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Diet Manager is already configured."
+    }
+  }
+}
